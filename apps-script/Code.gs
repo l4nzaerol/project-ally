@@ -436,7 +436,7 @@ function looksLikeEmail_(value) {
 }
 
 function looksLikeCert_(value) {
-  return /^MHS-/i.test(String(value || '').trim())
+  return /^(MHS|VAW)-/i.test(String(value || '').trim())
 }
 
 function looksLikeAge_(value) {
@@ -1265,7 +1265,7 @@ function renderPublicCertificate_(params) {
 }
 
 function generateCertId_() {
-  return 'MHS-' + Utilities.getUuid().replace(/-/g, '').substring(0, 10).toUpperCase()
+  return 'VAW-' + Utilities.getUuid().replace(/-/g, '').substring(0, 10).toUpperCase()
 }
 
 function json_(data) {

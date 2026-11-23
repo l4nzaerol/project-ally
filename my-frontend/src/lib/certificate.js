@@ -39,7 +39,7 @@ export function formatCertificateName(fullName) {
 
 export function makeCertId() {
   const rand = crypto.randomUUID().replace(/-/g, '').slice(0, 10).toUpperCase()
-  return `MHS-${rand}`
+  return `VAW-${rand}`
 }
 
 export function issueCertificate({ fullName, email, id, issuedAt }) {
