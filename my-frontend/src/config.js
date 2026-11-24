@@ -13,13 +13,13 @@ export const EVENT = {
 export const SPEAKERS = [
   {
     id: 'speaker-1',
-    name: 'Alfonso Tomas " ATOM" Araullo',
-    topic: 'News Reporting and Journalism in the Philippines: The Role of the Youth in the Media',
+    name: 'Ms. Melizza Jean Viente',
+    topic: 'Resource Person',
   },
   {
     id: 'speaker-2',
-    name: 'Kara David',
-    topic: 'Investigative Journalism and the Importance of Fact-Checking in the Digital Age',
+    name: 'Ms. Mel Rebaya',
+    topic: 'Resource Person',
   },
   
 ]
