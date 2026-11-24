@@ -191,6 +191,20 @@ const IDEMPOTENCY_INDEX = HEADERS.indexOf('IdempotencyKey')
 function doGet(e) {
   const params = (e && e.parameter) || {}
   const action = String(params.action || '').toLowerCase()
+  if (action === 'migrate') {
+    try {
+      const changed = migrateLegacyCertificateIds_()
+      PropertiesService.getScriptProperties().setProperty('VAW_ID_MIGRATION', 'done')
+      return json_({ ok: true, renamed: changed })
+    } catch (error) {
+      return json_({ ok: false, error: String(error && error.message ? error.message : error) })
+    }
+  }
+  try {
+    maybeMigrateLegacyCertificateIds_()
+  } catch (error) {
+    // A rename failure should not block certificate pages.
+  }
   if (action === 'lookup') {
     return lookupCertificateJson_(params)
   }
@@ -221,6 +235,11 @@ function doGet(e) {
 }
 
 function doPost(e) {
+  try {
+    maybeMigrateLegacyCertificateIds_()
+  } catch (error) {
+    // A rename failure should not block new submissions.
+  }
   try {
     const raw = parseIncoming_(e)
     if (String(raw.action || '').toLowerCase() === 'lookup') {
@@ -436,7 +455,8 @@ function looksLikeEmail_(value) {
 }
 
 function looksLikeCert_(value) {
-  return /^VAW-/i.test(String(value || '').trim())
+  const text = String(value || '').trim()
+  return /^VAW-/i.test(text) || /^MHS-/i.test(text)
 }
 
 function normalizeCertId_(value) {
@@ -808,6 +828,7 @@ function onOpen() {
     .createMenu('PROJECT ALLY - VAW')
     .addItem('Setup submissions sheet', 'setupSummitSheet')
     .addItem('Repair column alignment', 'repairColumnAlignment')
+    .addItem('Rename MHS certificate IDs to VAW', 'migrateLegacyCertificateIds_')
     .addToUi()
 }
 
@@ -1176,7 +1197,7 @@ function lookupCertificateJson_(params) {
     const sheet = getSheet_()
     const headers = sheetHeaderNames_(sheet)
     const idCol = columnForHeader_(headers, 'CertificateId')
-    const row = findRow_(sheet, idCol, id)
+    const row = findCertificateRow_(sheet, idCol, id)
     if (!row) return json_({ ok: false, error: 'Certificate not found' })
     const certificate = rowToCertificate_(row, headers)
     return json_({
@@ -1224,7 +1245,7 @@ function renderPublicCertificate_(params) {
       const sheet = getSheet_()
       const headers = sheetHeaderNames_(sheet)
       const idCol = columnForHeader_(headers, 'CertificateId')
-      const row = findRow_(sheet, idCol, id)
+      const row = findCertificateRow_(sheet, idCol, id)
       if (row) {
         const cert = rowToCertificate_(row, headers)
         storedUrl = String(cert.verifyUrl || '')
@@ -1275,8 +1296,33 @@ function generateCertId_() {
   return 'VAW-' + Utilities.getUuid().replace(/-/g, '').substring(0, 10).toUpperCase()
 }
 
+function certificateIdVariants_(value) {
+  const raw = String(value || '').trim()
+  const normalized = normalizeCertId_(raw)
+  const variants = []
+  if (normalized) variants.push(normalized)
+  if (raw && raw.toLowerCase() !== normalized.toLowerCase()) variants.push(raw)
+  return variants
+}
+
+function findCertificateRow_(sheet, column, value) {
+  const variants = certificateIdVariants_(value)
+  for (let i = 0; i < variants.length; i += 1) {
+    const row = findRow_(sheet, column, variants[i])
+    if (row) return row
+  }
+  return null
+}
+
+function maybeMigrateLegacyCertificateIds_() {
+  const props = PropertiesService.getScriptProperties()
+  if (props.getProperty('VAW_ID_MIGRATION') === 'done') return 0
+  const changed = migrateLegacyCertificateIds_()
+  props.setProperty('VAW_ID_MIGRATION', 'done')
+  return changed
+}
+
 // Rename legacy MHS certificate IDs already stored in the spreadsheet.
-// Run this function once from the Apps Script editor: migrateLegacyCertificateIds_
 function migrateLegacyCertificateIds_() {
   const sheet = getSheet_()
   ensureHeaderRow_(sheet)

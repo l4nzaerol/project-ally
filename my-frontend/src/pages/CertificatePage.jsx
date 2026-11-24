@@ -6,6 +6,7 @@ import {
   certificateQrUrl,
   downloadBlob,
   makeQrDataUrl,
+  normalizeCertificateId,
   recallCertificate,
   rememberCertificate,
   renderCertificatePng,
@@ -110,7 +111,7 @@ export default function CertificatePage({
         .trim()
         .replace(/[^\w]+/g, '-')
         .replace(/^-|-$/g, '')
-      downloadBlob(blob, `${certificate.id}-${safeName || 'certificate'}.png`)
+      downloadBlob(blob, `${normalizeCertificateId(certificate.id)}-${safeName || 'certificate'}.png`)
     } catch (downloadError) {
       setError(downloadError.message || 'Could not download the PNG. Please try again.')
     } finally {

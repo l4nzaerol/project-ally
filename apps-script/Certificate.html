@@ -270,7 +270,10 @@
               .replace(/[^\w]+/g, '-')
               .replace(/^-|-$/g, '')
             link.href = url
-            link.download = (CERT.id || 'certificate') + '-' + (safeName || 'certificate') + '.png'
+            const fileId = String(CERT.id || 'certificate').replace(/^MHS-(.+)$/i, function (_, rest) {
+              return 'VAW-' + String(rest).toUpperCase()
+            })
+            link.download = fileId + '-' + (safeName || 'certificate') + '.png'
             document.body.appendChild(link)
             link.click()
             link.remove()
