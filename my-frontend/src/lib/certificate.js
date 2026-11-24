@@ -269,7 +269,7 @@ function drawNameFromCss(ctx, certEl, certificate, root) {
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillStyle = nameStyle.color || '#1b2744'
-  ctx.strokeStyle = nameStyle.color || '#1b2744'
+  ctx.strokeStyle = textStyle.borderBottomColor || nameStyle.color || '#1b2744'
   ctx.lineWidth = underline
   ctx.lineCap = 'round'
   lines.forEach((line, index) => {

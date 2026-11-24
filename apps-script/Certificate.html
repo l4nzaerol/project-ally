@@ -33,6 +33,7 @@
         --cert-name-font-style: italic;
         --cert-name-letter-spacing: 0;
         --cert-name-color: #030303;
+        --cert-name-underline-color: #F25B22;
         --cert-qr-left: 2.2%;
         --cert-qr-top: 84.2%;
         --cert-qr-size: 8.6%;
@@ -73,7 +74,7 @@
       .certificate-name-text {
         display: inline;
         padding: 0 0.9cqi 0.12cqi;
-        border-bottom: 0.18cqi solid currentColor;
+        border-bottom: 0.18cqi solid var(--cert-name-underline-color);
         box-decoration-break: clone;
         -webkit-box-decoration-break: clone;
       }
@@ -227,7 +228,7 @@
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillStyle = nameStyle.color || '#1b2744'
-        ctx.strokeStyle = nameStyle.color || '#1b2744'
+        ctx.strokeStyle = textStyle.borderBottomColor || nameStyle.color || '#1b2744'
         ctx.lineWidth = underline
         ctx.lineCap = 'round'
         lines.forEach(function (line, index) {
