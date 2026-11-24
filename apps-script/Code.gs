@@ -1,6 +1,6 @@
-// Campus Journalism Year 2 feedback → Google Sheet
+PROJECT ALLY - VAW → Google Sheet
 // Spreadsheet: https://docs.google.com/spreadsheets/d/1qj07HWEW9Mu4KcIaZGUljnzg4qGOnTBy1PH80W-nUiw/edit
-// After changing this file: open THIS spreadsheet (Campus Journalism Year 2 Feedback) >
+// After changing this file: open THIS spreadsheet PROJECT ALLY - VAW
 // Extensions > Apps Script, paste this Code.gs, then Deploy > Manage deployments
 // > Edit (pencil) > Version: New version > Deploy. Execute as Me, Who has access: Anyone.
 // Put that /exec URL in my-frontend/.env as VITE_APPS_SCRIPT_URL. A script bound to
@@ -215,7 +215,7 @@ function doGet(e) {
   }
   return json_({
     ok: true,
-    service: 'Campus Journalism Year 2 feedback',
+    service: 'PROJECT ALLY - VAW',
     spreadsheetId: SPREADSHEET_ID,
   })
 }
@@ -799,7 +799,7 @@ function columnForHeader_(headers, name) {
 
 function onOpen() {
   SpreadsheetApp.getUi()
-    .createMenu('Campus Journalism Year 2')
+    .createMenu('PROJECT ALLY - VAW')
     .addItem('Setup submissions sheet', 'setupSummitSheet')
     .addItem('Repair column alignment', 'repairColumnAlignment')
     .addToUi()
