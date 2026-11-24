@@ -90,6 +90,4 @@ export const APPS_SCRIPT_URL = String(
 
 export const PUBLIC_BASE_URL = String(import.meta.env.VITE_PUBLIC_BASE_URL || '').replace(/\/$/, '')
 
-export const CERT_TEMPLATE_SRC = `${import.meta.env.BASE_URL}img/${encodeURIComponent(
-  'OK LANG YAN-MENTAL HEALTH CERT.png',
-)}`
+export const CERT_TEMPLATE_SRC = `${import.meta.env.BASE_URL}img/certificate.png`
