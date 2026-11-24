@@ -1,5 +1,5 @@
 import { APPS_SCRIPT_URL } from '../config'
-import { buildCertificateViewUrl, makeCertId } from './certificate.js'
+import { buildCertificateViewUrl, makeCertId, normalizeCertificateId } from './certificate.js'
 
 const STORAGE_KEY = 'mhs-submissions-v1'
 const MAX_ATTEMPTS = 8
@@ -22,7 +22,7 @@ function writeLocal(rows) {
 
 function toCertificate(row) {
   return {
-    id: row.id,
+    id: normalizeCertificateId(row.id),
     fullName: row.fullName,
     email: row.email,
     issuedAt: row.issuedAt,
@@ -38,7 +38,7 @@ async function submitLocal(payload) {
     return { ok: true, duplicate: true, certificate: toCertificate(existing), demo: true }
   }
 
-  const id = payload.certificateId || makeCertId()
+  const id = normalizeCertificateId(payload.certificateId) || makeCertId()
   const issuedAt = payload.issuedAt || new Date().toISOString()
   const row = {
     ...payload,
@@ -120,13 +120,14 @@ async function postWithRetry(payload) {
 
 function certificateFromLookup(data, certId) {
   if (!data?.ok || !data.certificate?.fullName) return null
+  const id = normalizeCertificateId(data.certificate.id || certId)
   return {
-    id: data.certificate.id || certId,
+    id,
     fullName: data.certificate.fullName,
     email: data.certificate.email || '',
     issuedAt: data.certificate.issuedAt || '',
     verifyUrl: buildCertificateViewUrl({
-      id: data.certificate.id || certId,
+      id,
       fullName: data.certificate.fullName,
       issuedAt: data.certificate.issuedAt,
     }),

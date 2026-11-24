@@ -37,6 +37,12 @@ export function formatCertificateName(fullName) {
   return String(fullName || '').trim().toLocaleUpperCase()
 }
 
+export function normalizeCertificateId(id) {
+  const value = String(id || '').trim()
+  const legacy = /^MHS-(.+)$/i.exec(value)
+  return legacy ? `VAW-${legacy[1].toUpperCase()}` : value
+}
+
 export function makeCertId() {
   const rand = crypto.randomUUID().replace(/-/g, '').slice(0, 10).toUpperCase()
   return `VAW-${rand}`
@@ -44,7 +50,7 @@ export function makeCertId() {
 
 export function issueCertificate({ fullName, email, id, issuedAt }) {
   const certificate = {
-    id: id || makeCertId(),
+    id: normalizeCertificateId(id) || makeCertId(),
     fullName: String(fullName || '').trim(),
     email: String(email || '').trim().toLowerCase(),
     issuedAt: issuedAt || new Date().toISOString(),

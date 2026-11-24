@@ -1,4 +1,4 @@
-PROJECT ALLY - VAW → Google Sheet
+//PROJECT ALLY - VAW → Google Sheet
 // Spreadsheet: https://docs.google.com/spreadsheets/d/1qj07HWEW9Mu4KcIaZGUljnzg4qGOnTBy1PH80W-nUiw/edit
 // After changing this file: open THIS spreadsheet PROJECT ALLY - VAW
 // Extensions > Apps Script, paste this Code.gs, then Deploy > Manage deployments
@@ -436,7 +436,13 @@ function looksLikeEmail_(value) {
 }
 
 function looksLikeCert_(value) {
-  return /^(MHS|VAW)-/i.test(String(value || '').trim())
+  return /^VAW-/i.test(String(value || '').trim())
+}
+
+function normalizeCertId_(value) {
+  const id = String(value || '').trim()
+  const match = /^MHS-(.+)$/i.exec(id)
+  return match ? 'VAW-' + match[1].toUpperCase() : id
 }
 
 function looksLikeAge_(value) {
@@ -923,8 +929,9 @@ function submitFeedback_(payload) {
     const email = String(payload.email).toLowerCase().trim()
     const retryRow = findRowNumber_(sheet, idempCol, payload.idempotencyKey)
 
-    const certId = looksLikeCert_(payload.certificateId)
-      ? String(payload.certificateId).trim()
+    const suppliedCertId = normalizeCertId_(payload.certificateId)
+    const certId = looksLikeCert_(suppliedCertId)
+      ? suppliedCertId
       : generateCertId_()
     const now = payload.issuedAt ? new Date(payload.issuedAt) : new Date()
     const issuedAt = isNaN(now.getTime()) ? new Date().toISOString() : now.toISOString()
@@ -1266,6 +1273,40 @@ function renderPublicCertificate_(params) {
 
 function generateCertId_() {
   return 'VAW-' + Utilities.getUuid().replace(/-/g, '').substring(0, 10).toUpperCase()
+}
+
+// Rename legacy MHS certificate IDs already stored in the spreadsheet.
+// Run this function once from the Apps Script editor: migrateLegacyCertificateIds_
+function migrateLegacyCertificateIds_() {
+  const sheet = getSheet_()
+  ensureHeaderRow_(sheet)
+  const headers = sheetHeaderNames_(sheet)
+  const idCol = columnForHeader_(headers, 'CertificateId')
+  const verifyCol = columnForHeader_(headers, 'VerifyUrl')
+  if (!idCol) throw new Error('CertificateId column is missing.')
+
+  let changed = 0
+  const lastRow = sheet.getLastRow()
+  if (lastRow < 2) return changed
+
+  const values = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues()
+  for (let i = 0; i < values.length; i += 1) {
+    const oldId = String(values[i][idCol - 1] || '').trim()
+    if (!/^MHS-/i.test(oldId)) continue
+
+    const newId = normalizeCertId_(oldId)
+    values[i][idCol - 1] = newId
+    if (verifyCol) {
+      values[i][verifyCol - 1] = String(values[i][verifyCol - 1] || '').replace(/MHS-/gi, 'VAW-')
+    }
+    changed += 1
+  }
+
+  if (changed) {
+    sheet.getRange(2, 1, values.length, sheet.getLastColumn()).setValues(values)
+    SpreadsheetApp.flush()
+  }
+  return changed
 }
 
 function json_(data) {
