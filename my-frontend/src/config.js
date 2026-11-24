@@ -1,5 +1,5 @@
 export const EVENT = {
-  name: '18-Day Campaign to End VAW',
+  name: 'Project Ally',
   shortName: 'END VAW',
   tagline: 'Sama-samang wakasan ang VAW sa Bagong Cabuyao',
   dateLabel: '2026',
