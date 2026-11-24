@@ -628,7 +628,7 @@ button.secondary:hover:not(:disabled) {
   --cert-name-left: 50%;
   --cert-name-top: 41.1%;
   --cert-name-width: 100%;
-  --cert-name-font-size: 5.9cqi;
+  --cert-name-font-size: 4.9cqi;
   --cert-name-font-family: "Times New Roman", Georgia, serif;
   --cert-name-font-weight: 200;
   --cert-name-font-style: normal;

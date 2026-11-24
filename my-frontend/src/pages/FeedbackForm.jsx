@@ -242,13 +242,13 @@ export default function FeedbackForm({ onIssued }) {
                 </div>
               </fieldset>
               <label>
-                School / Organization
+                Department/Office
                 <input
                   value={form.organization}
                   onChange={(event) => update('organization', event.target.value)}
                   autoComplete="organization"
                   required
-                  placeholder="e.g. Pamantasan ng Cabuyao"
+                  placeholder="e.g. Mayor's Office"
                   maxLength={120}
                 />
               </label>
